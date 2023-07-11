@@ -1,0 +1,81 @@
+//👉 Memoization
+T.C O(N*2)
+S.C O(N*2)+O(N)
+
+class Solution {
+public:
+    int f(vector<int>& prices,int n,int i,int buy,vector<vector<int>>&dp){
+        if(i>=n)return 0;
+
+        if(dp[i][buy]!=-1)return dp[i][buy];
+        if(buy==0){
+            return max(-prices[i]+f(prices,n,i+1,1,dp),f(prices,n,i+1,0,dp));
+        }
+        else{
+            return max(prices[i]+f(prices,n,i+2,0,dp),f(prices,n,i+1,1,dp));
+        }
+    }
+    int maxProfit(vector<int>& prices) {
+        int n=prices.size();
+         vector<vector<int>>dp(n,vector<int>(2,-1));
+         return  f(prices,n,0,0,dp);
+  }
+};
+----------------------------------------------------------------------------------------------------
+//👉 Tabulation
+  T.C O(N*2)
+  S.C O(N*2)
+
+
+class Solution {
+public:
+ int maxProfit(vector<int>& prices) {
+        int n=prices.size();
+        vector<vector<int>>dp(n+2,vector<int>(2,0));
+
+        for(int i=n-1;i>=0;i--){
+            for(int j=0;j<2;j++){
+                int profit=0;
+                if(j==0){
+                    profit=max(-prices[i]+dp[i+1][1],dp[i+1][0]);
+                }
+                else{
+                    profit=max(prices[i]+dp[i+2][0],dp[i+1][1]);
+                }
+                dp[i][j]=profit;
+            }
+        }
+
+        return dp[0][0];
+    }
+};
+-------------------------------------------------------------------------------------------------------
+👉Space Optimization
+T.C O(N*2)
+S.C O(2)+O(2)+O(2)
+
+class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+    // 👉 Space Optimization
+    
+        int n=prices.size();
+        vector<int>front(2,0);
+        vector<int>front1(2,0);//a row ahead of front (after sell the stock holiday)
+        vector<int>cur(2,0);
+
+        for(int i=n-1;i>=0;i--){
+            for(int j=0;j<2;j++){
+                if(j==0){
+                    cur[j]=max(-prices[i]+front[1],front[0]);
+                }
+                else{
+                    cur[j]=max(prices[i]+front1[0],front[1]);
+                }
+            }
+            front1=front;
+            front=cur;
+        }
+        return cur[0];
+    }
+};
